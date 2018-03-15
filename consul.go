@@ -1,16 +1,26 @@
 package consulstruct
 
-import "github.com/hashicorp/consul/api"
+import (
+	"errors"
+	"reflect"
+
+	"github.com/hashicorp/consul/api"
+)
+
+var (
+	ErrNonPtr = errors.New("target struct is not a pointer")
+)
 
 func New(c *Config) *Decoder {
 	return &Decoder{
-		config:c,
+		config: c,
 	}
 }
 
 type Config struct {
-	Prefix string
-	client *api.Client
+	Prefix    string
+	store     *api.KV
+	QueryOpts *api.QueryOptions
 }
 
 type Decoder struct {
@@ -18,10 +28,16 @@ type Decoder struct {
 }
 
 func (d *Decoder) Decode(v interface{}) error {
-	var err error
 
+	pointer := reflect.ValueOf(v)
+	if pointer.Kind() != reflect.Ptr {
+		return ErrNonPtr
+	}
 
-	return err
+	_, _, err := d.config.store.List(d.config.Prefix, d.config.QueryOpts)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
-
-
