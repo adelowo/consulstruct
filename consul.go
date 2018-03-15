@@ -51,7 +51,7 @@ func (d *Decoder) Decode(v interface{}) error {
 		return err
 	}
 
-	return d.decode(pointer.Elem(), pairsToDict(pairs))
+	return d.decode(pointer.Elem(), pairsToDict(d.config.Prefix, pairs))
 }
 
 func (d *Decoder) decode(ref reflect.Value, pairs map[string]*api.KVPair) error {
@@ -64,7 +64,7 @@ func (d *Decoder) decode(ref reflect.Value, pairs map[string]*api.KVPair) error 
 			continue
 		}
 
-		pair, ok := pairs[val]
+		pair, ok := pairs[normalize(d.config.Prefix, val)]
 		if !ok {
 			continue
 		}
@@ -77,7 +77,7 @@ func (d *Decoder) decode(ref reflect.Value, pairs map[string]*api.KVPair) error 
 	return nil
 }
 
-func pairsToDict(pairs api.KVPairs) map[string]*api.KVPair {
+func pairsToDict(prefix string, pairs api.KVPairs) map[string]*api.KVPair {
 	var p = make(map[string]*api.KVPair, len(pairs))
 
 	for _, pair := range pairs {
@@ -85,6 +85,14 @@ func pairsToDict(pairs api.KVPairs) map[string]*api.KVPair {
 	}
 
 	return p
+}
+
+func normalize(prefix, str string) string {
+	if !strings.HasSuffix(prefix, "/") {
+		prefix = prefix + "/"
+	}
+
+	return prefix + strings.TrimPrefix(str, "/")
 }
 
 func fetch(val reflect.StructField, s string) string {

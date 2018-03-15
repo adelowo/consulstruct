@@ -10,11 +10,11 @@ import (
 func main() {
 
 	type config struct {
-		Mysql              string   `consul:"x/play/database/mysql"`
-		Mongo              string   `consul:"x/play/database/mongo"`
-		IsActive           bool     `consul:"x/play/boolean"`
-		Count              int      `consul:"x/play/counter"`
-		MemcachedEndPoints []string `consul:"x/play/memcached/endpoint" consulSeparator:","`
+		MemcachedEndPoints []string `consul:"memcached/endpoint" consulSeparator:","`
+		Mysql              string   `consul:"database/mysql"`
+		Mongo              string   `consul:"database/mongo"`
+		IsActive           bool     `consul:"boolean"`
+		Count              int      `consul:"counter"`
 	}
 
 	conf := new(config)
@@ -25,14 +25,14 @@ func main() {
 	}
 
 	decoder := consulstruct.New(&consulstruct.Config{
-		Prefix:    "x/play",
+		Prefix:    "openheavens/play",
 		QueryOpts: nil,
 		Store:     client.KV(),
 	})
 
 	if err := decoder.Decode(conf); err != nil {
-		log.Fatal("An error occurred while decoding to struct... %v", err)
+		log.Fatal(err)
 	}
 
-	log.Println("Parsed successfully", conf)
+	log.Println(conf)
 }
