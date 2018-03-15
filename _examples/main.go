@@ -10,10 +10,11 @@ import (
 func main() {
 
 	type config struct {
-		Mysql    string `consul:"x/play/database/mysql"`
-		Mongo    string `consul:"x/play/database/mongo"`
-		IsActive bool   `consul:"x/play/boolean"`
-		Count    int    `consul:"x/play/counter"`
+		Mysql              string   `consul:"x/play/database/mysql"`
+		Mongo              string   `consul:"x/play/database/mongo"`
+		IsActive           bool     `consul:"x/play/boolean"`
+		Count              int      `consul:"x/play/counter"`
+		MemcachedEndPoints []string `consul:"x/play/memcached/endpoint" consulSeparator:","`
 	}
 
 	conf := new(config)
