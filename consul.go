@@ -8,7 +8,8 @@ import (
 )
 
 var (
-	ErrNonPtr = errors.New("target struct is not a pointer")
+	ErrNonPtr    = errors.New("target struct is not a pointer")
+	ErrNotStruct = errors.New("target must be a struct")
 )
 
 func New(c *Config) *Decoder {
@@ -32,6 +33,10 @@ func (d *Decoder) Decode(v interface{}) error {
 	pointer := reflect.ValueOf(v)
 	if pointer.Kind() != reflect.Ptr {
 		return ErrNonPtr
+	}
+
+	if pointer.Elem().Kind() != reflect.Struct {
+		return ErrNotStruct
 	}
 
 	_, _, err := d.config.store.List(d.config.Prefix, d.config.QueryOpts)
