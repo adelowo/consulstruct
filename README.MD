@@ -32,6 +32,8 @@ func main() {
 	}
 
 	decoder := consulstruct.New(&consulstruct.Config{
+		// This prefix would be applied to all elements in the config struct
+		// For example -> database/mysql would be evaluated as x/play/database/mysql
 		Prefix:    "x/play",
 		QueryOpts: nil,
 		Store:     client.KV(),
