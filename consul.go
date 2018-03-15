@@ -9,6 +9,11 @@ import (
 	"github.com/hashicorp/consul/api"
 )
 
+const (
+	consulMainTag   = "consul"
+	consulSeparator = "consulSeparator"
+)
+
 var (
 	ErrNonPtr    = errors.New("target struct is not a pointer")
 	ErrNotStruct = errors.New("target must be a struct")
@@ -53,7 +58,7 @@ func (d *Decoder) decode(ref reflect.Value, pairs map[string]*api.KVPair) error 
 
 	for i := 0; i < ref.Type().NumField(); i++ {
 		structField := ref.Type().Field(i)
-		val := fetch(ref.Type().Field(i))
+		val := fetch(structField, consulMainTag)
 
 		if len(strings.TrimSpace(val)) == 0 {
 			continue
@@ -82,17 +87,29 @@ func pairsToDict(pairs api.KVPairs) map[string]*api.KVPair {
 	return p
 }
 
-func fetch(val reflect.StructField) string {
-	return val.Tag.Get("consul")
+func fetch(val reflect.StructField, s string) string {
+	return val.Tag.Get(s)
 }
 
-// strings, ints and booleans
 func set(field reflect.Value, refType reflect.StructField, pair *api.KVPair) error {
 	var err error
 
 	s := string(pair.Value)
 
 	switch field.Kind() {
+
+	case reflect.Slice:
+
+		separator := fetch(refType, consulSeparator)
+
+		if reflect.TypeOf([]string(nil)) == refType.Type {
+			splitted := strings.Split(s, separator)
+			field.Set(reflect.ValueOf(splitted))
+			return nil
+		}
+
+		err = errors.New("consulstruct : unsupported operation")
+		break
 
 	case reflect.String:
 		field.SetString(s)
@@ -117,7 +134,6 @@ func set(field reflect.Value, refType reflect.StructField, pair *api.KVPair) err
 		break
 
 	default:
-
 		err = errors.New("consulstruct : unsupported operation")
 	}
 
