@@ -25,7 +25,7 @@ func main() {
 	}
 
 	decoder := consulstruct.New(&consulstruct.Config{
-		Prefix:    "openheavens/play",
+		Prefix:    "x/play",
 		QueryOpts: nil,
 		Store:     client.KV(),
 	})
