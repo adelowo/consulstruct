@@ -5,10 +5,10 @@ Decode values from consul into a struct.
 
 Supported types :
 
-- [ ] `[]string`
-- [ ] string
-- [ ] int
-- [ ] bool
+- [x] `[]string`
+- [x] string
+- [x] int
+- [x] bool
 
 ```go
 
