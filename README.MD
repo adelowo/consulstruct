@@ -3,6 +3,13 @@
 Decode values from consul into a struct.
 
 
+Supported types :
+
+- [ ] `[]string`
+- [ ] string
+- [ ] int
+- [ ] bool
+
 ```go
 
 package main
